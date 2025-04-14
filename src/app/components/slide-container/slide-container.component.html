@@ -1,1 +1,5 @@
-<p>slide-container works!</p>
+<div class="slide-container">
+  <app-slide *ngFor="let slide of slides; let i = index" [slide]="slide" [isActive]="isActiveSlide(i)"
+    [isPrevious]="isPreviousSlide(i)" [isNext]="isNextSlide(i)" [isTransitioning]="isTransitioning">
+  </app-slide>
+</div>
