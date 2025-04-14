@@ -28,7 +28,7 @@ An interactive educational web simulator designed to guide users through real-wo
 ### Installation
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Development server
