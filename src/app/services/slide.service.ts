@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { computed, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface Slide {
@@ -64,45 +64,35 @@ export class SlideService {
     return this.isTransitioningSubject.asObservable();
   }
 
-  get currentSlideIndex(): number {
-    return this.currentSlideIndexSubject.getValue();
-  }
+  currentSlideIndex = computed(() => this.currentSlideIndexSubject.getValue());
 
-  get slidesCount(): number {
-    return this.slides.length;
-  }
+  slidesCount = computed(() => this.slides.length);
 
   getSlides(): Slide[] {
     return this.slides;
   }
 
-  getCurrentSlide(): Slide {
-    return this.slides[this.currentSlideIndex];
-  }
+  getCurrentSlide = computed(() => this.slides[this.currentSlideIndex()]);
 
   navigateToSlide(index: number): void {
-    if (index >= 0 && index < this.slides.length && index !== this.currentSlideIndex) {
+    if (index >= 0 && index < this.slides.length && index !== this.currentSlideIndex()) {
       this.isTransitioningSubject.next(true);
 
       // Simulate transition delay
-      setTimeout(() => {
-        this.currentSlideIndexSubject.next(index);
+      this.currentSlideIndexSubject.next(index);
 
-        // Reset transition state after animation
-        setTimeout(() => {
-          this.isTransitioningSubject.next(false);
-        }, 500);
-      }, 300);
+      // Reset transition state after animation
+      this.isTransitioningSubject.next(false);
     }
   }
 
   navigateNext(): void {
-    const nextIndex = (this.currentSlideIndex + 1) % this.slides.length;
+    const nextIndex = (this.currentSlideIndex() + 1) % this.slides.length;
     this.navigateToSlide(nextIndex);
   }
 
   navigatePrevious(): void {
-    const prevIndex = (this.currentSlideIndex - 1 + this.slides.length) % this.slides.length;
+    const prevIndex = (this.currentSlideIndex() - 1 + this.slides.length) % this.slides.length;
     this.navigateToSlide(prevIndex);
   }
 }

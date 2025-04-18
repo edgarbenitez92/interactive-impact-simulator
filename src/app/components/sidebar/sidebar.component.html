@@ -1,0 +1,36 @@
+<div class="sidebar-wrapper" (click)="toggleSidebar()">
+  <!-- Version minified -->
+  <div class="indicators-container">
+    <div class="logo">cfr</div>
+
+    <div class="indicators">
+      @for (category of categories; track $index) {
+      <div class="indicator" [class.active]="isActiveCategory(category)" (click)="navigateToSlide(category.slides[0])">
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Version expanded -->
+  <div class="sidebar-open" [class.hidden]="!isExpanded()">
+    <nav class="menu">
+      @for (category of categories; track $index) {
+      <div class="menu-item" [style.height]="getCategoryHeight(category)" [class.active]="isActiveCategory(category)"
+        (click)="navigateToSlide(category.slides[0])">
+        {{ category.name }}
+      </div>
+      }
+    </nav>
+
+    <div class="footer">
+      <div class="footer-links">
+        <a>RESOURCES</a>
+        <a>CREDITS</a>
+      </div>
+
+      <button (click)="toggleMute()">
+        {{ audioService.isMuted ? 'UNMUTE' : 'MUTE' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,11 @@
-<div class="home-container">
-  <app-navigation></app-navigation>
-  <app-slide-container></app-slide-container>
-  <app-audio-player></app-audio-player>
-</div>
+<mat-sidenav-container class="sidebar-container" hasBackdrop="false">
+  <mat-sidenav #sidenav mode="over" position="start" [opened]="true" class="custom-sidenav"
+    [class.expanded]="isSidebarOpen()">
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content" (click)="toggleSidebar()">
+    <app-slide-container></app-slide-container>
+    <app-audio-player></app-audio-player>
+  </mat-sidenav-content>
+</mat-sidenav-container>

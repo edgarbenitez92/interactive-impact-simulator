@@ -1,5 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Injectable } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { BehaviorSubject } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AudioService {
+  private isMutedSubject = new BehaviorSubject<boolean>(true);
+
+  get isMuted$() {
+    return this.isMutedSubject.asObservable();
+  }
+
+  get isMuted() {
+    return this.isMutedSubject.value;
+  }
+
+  toggleMute() {
+    this.isMutedSubject.next(!this.isMutedSubject.value);
+    console.log(`Audio ${this.isMuted ? 'muted' : 'unmuted'}`);
+  }
+
+  setMuted(isMuted: boolean) {
+    this.isMutedSubject.next(isMuted);
+    console.log(`Audio set to ${isMuted ? 'muted' : 'unmuted'}`);
+  }
+}
 
 @Component({
   selector: 'app-audio-player',
@@ -9,37 +35,14 @@ import { CommonModule } from '@angular/common';
   styleUrl: './audio-player.component.scss'
 })
 export class AudioPlayerComponent implements OnInit {
-  isMuted: boolean = false;
-  audioElement: HTMLAudioElement | null = null;
-
-  constructor() { }
+  // No necesitamos crear un elemento de audio real para este ejemplo
+  constructor(public audioService: AudioService) { }
 
   ngOnInit(): void {
-    // Create audio element
-    this.audioElement = new Audio();
-    this.audioElement.src = 'assets/audio/ambient.mp3'; // Replace with your audio file
-    this.audioElement.loop = true;
-    this.audioElement.volume = 0.3;
-
-    // Auto-play requires user interaction first in most browsers
-    document.addEventListener('click', () => {
-      if (this.audioElement && !this.isMuted) {
-        this.audioElement.play()
-          .catch(error => console.error('Audio playback failed:', error));
-      }
-    }, { once: true });
+    console.log('Audio Player initialized - simulated mode');
   }
 
   toggleMute(): void {
-    if (!this.audioElement) return;
-
-    this.isMuted = !this.isMuted;
-
-    if (this.isMuted) {
-      this.audioElement.pause();
-    } else {
-      this.audioElement.play()
-        .catch(error => console.error('Audio playback failed:', error));
-    }
+    this.audioService.toggleMute();
   }
 }

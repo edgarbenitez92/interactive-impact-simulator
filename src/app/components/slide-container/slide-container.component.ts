@@ -58,7 +58,7 @@ export class SlideContainerComponent implements OnInit {
     // Re-enable wheel after a delay
     setTimeout(() => {
       this.isWheelEnabled = true;
-    }, 1000);
+    }, 500);
   }
 
   @HostListener('touchstart', ['$event'])
