@@ -44,21 +44,13 @@ export class SlideContainerComponent implements OnInit {
 
   @HostListener('wheel', ['$event'])
   handleWheel(event: WheelEvent): void {
-    if (this.isTransitioning || !this.isWheelEnabled) return;
-
-    // Disable wheel for a short time to prevent multiple triggers
-    this.isWheelEnabled = false;
+    if (this.isTransitioning) return;
 
     if (event.deltaY > 0) {
       this.slideService.navigateNext();
     } else if (event.deltaY < 0) {
       this.slideService.navigatePrevious();
     }
-
-    // Re-enable wheel after a delay
-    setTimeout(() => {
-      this.isWheelEnabled = true;
-    }, 500);
   }
 
   @HostListener('touchstart', ['$event'])

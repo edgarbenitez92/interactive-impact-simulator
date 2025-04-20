@@ -12,9 +12,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class AudioPlayerComponent implements OnInit {
   private readonly audioPlayerService = inject(AudioPlayerService);
 
-  isAudioMuted = toSignal(this.audioPlayerService.isMuted$, {
-    initialValue: false
-  });
+  isAudioMuted = computed(() => this.audioPlayerService.isMuted$());
 
   ngOnInit(): void {
     console.log('Audio Player initialized - simulated mode');

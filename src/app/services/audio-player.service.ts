@@ -1,28 +1,46 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AudioPlayerService {
+  private audioElement: HTMLAudioElement;
+  private currentAudioPath = signal<string>('');
+  isMuted$ = signal(true);
 
-  private isMutedSubject = new BehaviorSubject<boolean>(true);
-
-  get isMuted$() {
-    return this.isMutedSubject.asObservable();
+  constructor() {
+    this.audioElement = new Audio();
+    this.audioElement.loop = true;
   }
 
-  get isMuted() {
-    return this.isMutedSubject.value;
+  loadAudio(audioPath: string): void {
+    if (this.currentAudioPath() === audioPath) return;
+
+    this.currentAudioPath.set(audioPath);
+    this.audioElement.src = audioPath;
+    this.audioElement.load();
+
+    if (!this.isMuted$()) {
+      this.audioElement.play().catch(error => {
+        console.error('Error playing audio:', error);
+      });
+    }
   }
 
-  toggleMute() {
-    this.isMutedSubject.next(!this.isMutedSubject.value);
-    console.log(`Audio ${this.isMuted ? 'muted' : 'unmuted'}`);
+  toggleMute(): void {
+    this.isMuted$.update(value => !value);
+
+    if (this.isMuted$()) {
+      this.audioElement.pause();
+    } else {
+      this.audioElement.play().catch(error => {
+        console.error('Error playing audio:', error);
+      });
+    }
   }
 
-  setMuted(isMuted: boolean) {
-    this.isMutedSubject.next(isMuted);
-    console.log(`Audio set to ${isMuted ? 'muted' : 'unmuted'}`);
+  stopAudio(): void {
+    this.audioElement.pause();
+    this.audioElement.currentTime = 0;
   }
 }

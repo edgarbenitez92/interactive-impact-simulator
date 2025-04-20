@@ -1,6 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AudioPlayerComponent } from '../audio-player/audio-player.component';
 import { AudioPlayerService } from '../../services/audio-player.service';
@@ -11,6 +12,7 @@ import { SlideService } from '../../services/slide.service';
 interface Category {
   name: string;
   slides: number[];
+  audio: string;
 }
 
 @Component({
@@ -19,7 +21,8 @@ interface Category {
   styleUrl: './sidebar.component.scss',
   imports: [MatSidenavModule, AudioPlayerComponent],
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
+  private readonly destroyRef$ = inject(DestroyRef);
   private readonly sidebarService = inject(SidebarService);
   private readonly audioPlayerService = inject(AudioPlayerService);
   private readonly slideService = inject(SlideService);
@@ -27,20 +30,60 @@ export class SidebarComponent {
   slides: Slide[] = this.slideService.getSlides();
   isExpanded = computed(() => this.sidebarService.isSidebarOpen());
 
-  isAudioMuted = toSignal(this.audioPlayerService.isMuted$, {
-    initialValue: false
-  });
+  isAudioMuted = computed(() => this.audioPlayerService.isMuted$());
 
-  currentIndex = toSignal(this.slideService.currentSlideIndex$, {
-    initialValue: 0
-  });
+  currentIndex = signal(0);
 
   categories: Category[] = [
-    { name: 'The Amazon and Climate', slides: [1] },
-    { name: 'People of the Amazon', slides: [2] },
-    { name: 'Biodiversity', slides: [3] },
-    { name: 'How to Reduce and Reverse Deforestation', slides: [4] }
+    {
+      name: 'The Amazon and Climate',
+      slides: [1],
+      audio: 'assets/audio/river.mp3'
+    },
+    {
+      name: 'People of the Amazon',
+      slides: [2],
+      audio: 'assets/audio/birds.mp3'
+    },
+    {
+      name: 'Biodiversity',
+      slides: [3],
+      audio: 'assets/audio/ambient.mp3'
+    },
+    {
+      name: 'How to Reduce and Reverse Deforestation',
+      slides: [4],
+      audio: 'assets/audio/spring.mp3'
+    }
   ];
+
+  ngOnInit(): void {
+    // Load the initial audio of the first category
+    const initialCategory = this.categories[0];
+    if (initialCategory) {
+      this.audioPlayerService.loadAudio(initialCategory.audio);
+    }
+
+    this.subsToCurrentSlideIndex();
+  }
+
+  subsToCurrentSlideIndex(): void {
+    this.slideService.currentSlideIndex$
+      .pipe(takeUntilDestroyed(this.destroyRef$))
+      .subscribe(index => {
+        console.log('index', index);
+        this.currentIndex.set(index);
+
+        // Encontrar la categoría que contiene el slide actual
+        const currentCategory = this.categories.find(category =>
+          category.slides.includes(index)
+        );
+
+        if (currentCategory) {
+          this.audioPlayerService.loadAudio(currentCategory.audio);
+        }
+      });
+  }
 
   toggleSidebar(): void {
     if (!this.isExpanded()) {
