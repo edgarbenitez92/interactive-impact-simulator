@@ -3,124 +3,145 @@
   position: relative;
   transition: all 0.3s ease;
   cursor: pointer;
+}
 
-  .custom-sidenav {
-    width: 50px;
-    border-right: none;
-    background: rgba(0, 0, 0, 0.8);
-    transition: width 0.3s ease;
+.indicators-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  position: fixed;
+  left: 10px;
+  top: 0;
+  color: #CCCCCC;
+  z-index: 1000;
 
-    &.expanded {
-      width: 250px;
-    }
+  .logo {
+    margin-bottom: 1rem;
 
-    .mat-drawer-inner-container {
-      overflow: hidden;
-    }
-  }
-
-  .indicators-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px 0;
-    position: fixed;
-    left: 10px;
-    top: 0;
-    color: #CCCCCC;
-    z-index: 1000;
-
-    .logo {
+    h1 {
       font-size: 1rem;
       font-weight: bold;
-      margin-bottom: 1rem;
-    }
-
-    .indicators {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-
-      .indicator {
-        width: 3px;
-        height: 40px;
-        background-color: rgba(61, 61, 61, .7);
-        box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &.active {
-          background: #666666;
-        }
-
-        &:hover {
-          background: #666666;
-        }
-      }
+      margin: 0;
     }
   }
 
-  .sidebar-open {
-    height: 100%;
+  .indicators {
     display: flex;
     flex-direction: column;
-    padding: 40px 0;
-    transform: translateX(0);
-    transition: transform 0.3s ease;
-    margin-left: 30px;
+    gap: 10px;
 
-    &.hidden {
-      transform: translateX(-100%);
-    }
+    .indicator {
+      width: 3px;
+      height: 40px;
+      background-color: rgba(61, 61, 61, .7);
+      box-shadow: 1px 1px 1px rgba(0, 0, 0, .5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0;
+      border: none;
 
-    .menu {
-      flex: 1;
+      &.active {
+        background: #666666;
+      }
 
-      &-item {
-        cursor: pointer;
-        font-size: 0.75rem;
-        padding: 1.25rem 0.75rem;
-        transition: all 0.2s ease;
-        color: #9B9B9B;
-
-        &.active {
-          color: #ffffff;
-        }
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.05);
-        }
+      &:hover {
+        background: #666666;
       }
     }
+  }
+}
 
-    .footer {
-      margin-top: auto;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+.sidebar-open {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 0;
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+  margin-left: 30px;
 
-      &-links {
+  &.hidden {
+    transform: translateX(-100%);
+  }
+
+  .menu {
+    flex: 1;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu-item {
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 12px 15px;
+      margin-bottom: 5px;
+      transition: all 0.2s ease;
+      color: #9B9B9B;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+
+      &.active {
+        color: #ffffff;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+    &-links {
+      margin-bottom: 15px;
+
+      ul {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 1rem;
-        font-size: 0.75rem;
-        color: #CCCCCC;
+        list-style: none;
+        padding: 0;
+        margin: 0;
       }
 
-      button {
-        font-size: 0.75rem;
-        width: 100%;
-        padding: 0.5rem;
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+      a {
         color: #CCCCCC;
+        font-size: 0.75rem;
+        text-decoration: none;
         cursor: pointer;
+
+        &:hover {
+          color: #ffffff;
+        }
+      }
+    }
+
+    button {
+      font-size: 0.75rem;
+      width: 100%;
+      padding: 8px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #CCCCCC;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
       }
     }
   }
+}
 
-  .hidden {
-    display: none;
-    transition: display 0.8s ease;
-  }
+.hidden {
+  display: none;
+  transition: display 0.8s ease;
 }

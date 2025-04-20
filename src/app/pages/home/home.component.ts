@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, HostListener, inject, signal, ViewChild } from '@angular/core';
-import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { Component, computed, inject } from '@angular/core';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { AudioPlayerComponent } from '../../components/audio-player/audio-player.component';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
@@ -21,7 +21,6 @@ import { SidebarService } from '../../services/sidebar.service';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {
-  @ViewChild('sidenav') sidenav!: MatSidenav;
   private sidebarService = inject(SidebarService);
 
   isSidebarOpen = computed(() => this.sidebarService.isSidebarOpen());

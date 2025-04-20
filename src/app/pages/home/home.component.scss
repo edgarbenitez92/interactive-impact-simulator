@@ -3,14 +3,14 @@
   width: 100%;
 
   .custom-sidenav {
-    width: 50px; // Ancho cuando está cerrado
+    width: 50px; // Width when closed
     transition: width 0.3s ease;
     overflow: hidden;
     position: absolute;
     border-radius: 0;
 
     &.expanded {
-      width: 250px;
+      width: 170px; // Width when expanded
       background: rgba(0, 0, 0, 0.8);
     }
 
@@ -21,7 +21,7 @@
     }
 
     .mat-drawer-inner-container {
-      width: 250px; // Same width as the expanded version
+      width: 170px; // Same width as the expanded version
       display: flex;
       flex-direction: column;
     }
