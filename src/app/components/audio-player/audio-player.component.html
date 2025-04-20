@@ -1,4 +1,7 @@
-<div class="audio-control" (click)="toggleMute()">
-  <div class="audio-icon" *ngIf="audioService.isMuted">🔇</div>
-  <div class="audio-icon" *ngIf="!audioService.isMuted">🔊</div>
+<div class="audio-control" (click)="toggleMute($event)">
+  @if (isAudioMuted()) {
+  <div class="audio-icon">🔇</div>
+  } @else {
+  <div class="audio-icon">🔊</div>
+  }
 </div>

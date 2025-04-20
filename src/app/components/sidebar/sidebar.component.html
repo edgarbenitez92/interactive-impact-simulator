@@ -1,5 +1,6 @@
 <aside class="sidebar-wrapper" role="complementary" aria-label="Navigation sidebar" (click)="toggleSidebar()">
-  <div class="indicators-container">
+  <!-- Version minified -->
+  <div class="indicators-container" [class.expanded]="isExpanded()">
     <header class="logo" role="banner">
       <h1>cfr</h1>
     </header>
@@ -12,8 +13,16 @@
       </button>
       }
     </nav>
+
+    @if (!isExpanded()) {
+    <figure class="audio-player-container" role="region" aria-label="Audio controls" (click)="$event.stopPropagation()">
+      <figcaption class="visually-hidden">Audio player controls</figcaption>
+      <app-audio-player></app-audio-player>
+    </figure>
+    }
   </div>
 
+  <!-- Version expanded -->
   <div class="sidebar-open" [class.hidden]="!isExpanded()">
     <nav class="menu" aria-label="Main navigation">
       <ul role="list">
@@ -36,8 +45,11 @@
           <li><a href="#" role="link">CREDITS</a></li>
         </ul>
       </nav>
-      <button (click)="toggleMute()" aria-label="Toggle audio" [attr.aria-pressed]="audioService.isMuted">
-        {{ audioService.isMuted ? 'UNMUTE' : 'MUTE' }}
+
+      <hr>
+
+      <button (click)="toggleMute()" aria-label="Toggle audio" [attr.aria-pressed]="isAudioMuted()">
+        {{ isAudioMuted() ? 'UNMUTE' : 'MUTE' }}
       </button>
     </footer>
   </div>

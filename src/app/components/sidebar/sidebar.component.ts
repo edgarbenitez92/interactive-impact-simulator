@@ -1,11 +1,12 @@
-import { Component, computed, DestroyRef, HostListener, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 
-import { AudioService } from '../audio-player/audio-player.component';
+import { AudioPlayerComponent } from '../audio-player/audio-player.component';
+import { AudioPlayerService } from '../../services/audio-player.service';
+import { SidebarService } from '../../services/sidebar.service';
 import { Slide } from '../../services/slide.service';
 import { SlideService } from '../../services/slide.service';
-import { SidebarService } from '../../services/sidebar.service';
 
 interface Category {
   name: string;
@@ -16,17 +17,23 @@ interface Category {
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
-  imports: [MatSidenavModule],
+  imports: [MatSidenavModule, AudioPlayerComponent],
 })
-export class SidebarComponent implements OnInit {
-  private readonly destroyRef$ = inject(DestroyRef);
+export class SidebarComponent {
   private readonly sidebarService = inject(SidebarService);
-  public readonly audioService = inject(AudioService);
+  private readonly audioPlayerService = inject(AudioPlayerService);
   private readonly slideService = inject(SlideService);
 
   slides: Slide[] = this.slideService.getSlides();
-  currentIndex = signal(0);
   isExpanded = computed(() => this.sidebarService.isSidebarOpen());
+
+  isAudioMuted = toSignal(this.audioPlayerService.isMuted$, {
+    initialValue: false
+  });
+
+  currentIndex = toSignal(this.slideService.currentSlideIndex$, {
+    initialValue: 0
+  });
 
   categories: Category[] = [
     { name: 'The Amazon and Climate', slides: [1] },
@@ -34,19 +41,6 @@ export class SidebarComponent implements OnInit {
     { name: 'Biodiversity', slides: [3] },
     { name: 'How to Reduce and Reverse Deforestation', slides: [4] }
   ];
-
-  ngOnInit(): void {
-    this.subsToCurrentSlideIndex();
-  }
-
-  subsToCurrentSlideIndex(): void {
-    this.slideService.currentSlideIndex$
-      .pipe(takeUntilDestroyed(this.destroyRef$))
-      .subscribe(index => {
-        console.log('index', index);
-        this.currentIndex.set(index);
-      });
-  }
 
   toggleSidebar(): void {
     if (!this.isExpanded()) {
@@ -83,7 +77,7 @@ export class SidebarComponent implements OnInit {
   }
 
   toggleMute(): void {
-    this.audioService.toggleMute();
+    this.audioPlayerService.toggleMute();
   }
 
   // Method to calculate the relative height of the category based on the number of slides

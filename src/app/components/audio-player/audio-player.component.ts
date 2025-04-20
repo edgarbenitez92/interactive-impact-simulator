@@ -1,48 +1,27 @@
-import { Component, OnInit, Injectable } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class AudioService {
-  private isMutedSubject = new BehaviorSubject<boolean>(true);
-
-  get isMuted$() {
-    return this.isMutedSubject.asObservable();
-  }
-
-  get isMuted() {
-    return this.isMutedSubject.value;
-  }
-
-  toggleMute() {
-    this.isMutedSubject.next(!this.isMutedSubject.value);
-    console.log(`Audio ${this.isMuted ? 'muted' : 'unmuted'}`);
-  }
-
-  setMuted(isMuted: boolean) {
-    this.isMutedSubject.next(isMuted);
-    console.log(`Audio set to ${isMuted ? 'muted' : 'unmuted'}`);
-  }
-}
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { AudioPlayerService } from '../../services/audio-player.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-audio-player',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './audio-player.component.html',
   styleUrl: './audio-player.component.scss'
 })
 export class AudioPlayerComponent implements OnInit {
-  // No necesitamos crear un elemento de audio real para este ejemplo
-  constructor(public audioService: AudioService) { }
+  private readonly audioPlayerService = inject(AudioPlayerService);
+
+  isAudioMuted = toSignal(this.audioPlayerService.isMuted$, {
+    initialValue: false
+  });
 
   ngOnInit(): void {
     console.log('Audio Player initialized - simulated mode');
   }
 
-  toggleMute(): void {
-    this.audioService.toggleMute();
+  toggleMute(event: Event): void {
+    event.stopPropagation();
+    this.audioPlayerService.toggleMute();
   }
 }
