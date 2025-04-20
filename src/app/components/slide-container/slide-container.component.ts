@@ -1,39 +1,30 @@
-import { Component, HostListener, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, HostListener, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+
 import { SlideComponent } from '../slide/slide.component';
 import { SlideService, Slide } from '../../services/slide.service';
 
 @Component({
   selector: 'app-slide-container',
   standalone: true,
-  imports: [CommonModule, SlideComponent],
+  imports: [SlideComponent],
   templateUrl: './slide-container.component.html',
   styleUrl: './slide-container.component.scss'
 })
-export class SlideContainerComponent implements OnInit {
-  slides: Slide[] = [];
-  currentIndex: number = 0;
-  isTransitioning: boolean = false;
-  touchStartY: number = 0;
-  touchEndY: number = 0;
-  wheelDebounceTimer: any = null;
-  isWheelEnabled: boolean = true;
+export class SlideContainerComponent {
+  private readonly slideService = inject(SlideService);
 
-  constructor(private slideService: SlideService) { }
+  slides: Slide[] = this.slideService.getSlides();
 
-  ngOnInit(): void {
-    this.slides = this.slideService.getSlides();
-    this.slideService.currentSlideIndex$.subscribe(index => {
-      this.currentIndex = index;
-    });
-    this.slideService.isTransitioning$.subscribe(transitioning => {
-      this.isTransitioning = transitioning;
-    });
-  }
+  currentIndex = toSignal(this.slideService.currentSlideIndex$);
+
+  isTransitioning = toSignal(this.slideService.isTransitioning$, { initialValue: false });
+  touchStartY = signal(0);
+  touchEndY = signal(0);
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent): void {
-    if (this.isTransitioning) return;
+    if (this.isTransitioning()) return;
 
     if (event.key === 'ArrowDown' || event.key === 'PageDown') {
       this.slideService.navigateNext();
@@ -44,7 +35,8 @@ export class SlideContainerComponent implements OnInit {
 
   @HostListener('wheel', ['$event'])
   handleWheel(event: WheelEvent): void {
-    if (this.isTransitioning) return;
+    event.preventDefault();
+    if (this.isTransitioning()) return;
 
     if (event.deltaY > 0) {
       this.slideService.navigateNext();
@@ -55,16 +47,15 @@ export class SlideContainerComponent implements OnInit {
 
   @HostListener('touchstart', ['$event'])
   handleTouchStart(event: TouchEvent): void {
-    this.touchStartY = event.touches[0].clientY;
+    this.touchStartY.set(event.touches[0].clientY);
   }
 
   @HostListener('touchend', ['$event'])
   handleTouchEnd(event: TouchEvent): void {
-    if (this.isTransitioning) return;
+    if (this.isTransitioning()) return;
 
-    this.touchEndY = event.changedTouches[0].clientY;
-
-    const touchDiff = this.touchStartY - this.touchEndY;
+    this.touchEndY.set(event.changedTouches[0].clientY);
+    const touchDiff = this.touchStartY() - this.touchEndY();
 
     // Use a threshold to detect intentional swipes
     if (Math.abs(touchDiff) > 50) {
@@ -79,16 +70,16 @@ export class SlideContainerComponent implements OnInit {
   }
 
   isActiveSlide(index: number): boolean {
-    return index === this.currentIndex;
+    return this.slides[index].id === this.currentIndex();
   }
 
   isPreviousSlide(index: number): boolean {
-    return (index === this.currentIndex - 1) ||
-      (this.currentIndex === 0 && index === this.slides.length - 1);
+    const currentSlideIndex = this.slides.findIndex(slide => slide.id === this.currentIndex());
+    return index === currentSlideIndex - 1;
   }
 
   isNextSlide(index: number): boolean {
-    return (index === this.currentIndex + 1) ||
-      (this.currentIndex === this.slides.length - 1 && index === 0);
+    const currentSlideIndex = this.slides.findIndex(slide => slide.id === this.currentIndex());
+    return index === currentSlideIndex + 1;
   }
 }

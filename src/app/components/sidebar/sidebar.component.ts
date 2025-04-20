@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AudioPlayerComponent } from '../audio-player/audio-player.component';
@@ -58,23 +57,32 @@ export class SidebarComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    // Load the initial audio of the first category
+    this.loadInitialAudio();
+    this.subsToCurrentSlideIndex();
+    this.stablishInitialSlide();
+  }
+
+  stablishInitialSlide(): void {
+    const currentSlide = this.slideService.getCurrentSlide();
+    if (currentSlide) {
+      this.currentIndex.set(currentSlide.id);
+    }
+  }
+
+  loadInitialAudio(): void {
     const initialCategory = this.categories[0];
     if (initialCategory) {
       this.audioPlayerService.loadAudio(initialCategory.audio);
     }
-
-    this.subsToCurrentSlideIndex();
   }
 
   subsToCurrentSlideIndex(): void {
     this.slideService.currentSlideIndex$
       .pipe(takeUntilDestroyed(this.destroyRef$))
       .subscribe(index => {
-        console.log('index', index);
         this.currentIndex.set(index);
 
-        // Encontrar la categoría que contiene el slide actual
+        // Search for the category that contains the current slide
         const currentCategory = this.categories.find(category =>
           category.slides.includes(index)
         );
@@ -94,21 +102,11 @@ export class SidebarComponent implements OnInit {
   navigateToSlide(index: number): void {
     if (!this.isExpanded()) return;
 
-    console.log('navigateToSlide', index);
     this.slideService.navigateToSlide(index);
 
-    // TODO: Establish a better way to close the sidebar after navigating to a slide
-    // with the action of toggleSidebar
     setTimeout(() => {
       this.sidebarService.isSidebarOpen.update(value => value = false);
     }, 0);
-
-    // Opcionalmente, cerrar el sidebar en móvil después de navegar
-    // if (window.innerWidth < 768) {
-    //   setTimeout(() => {
-    //     this.sidebarService.isSidebarOpen.update(value => value = false);
-    //   }, 500);
-    // }
   }
 
   isActiveSlide(index: number): boolean {

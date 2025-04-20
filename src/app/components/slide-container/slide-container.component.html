@@ -1,5 +1,7 @@
 <div class="slide-container">
-  <app-slide *ngFor="let slide of slides; let i = index" [slide]="slide" [isActive]="isActiveSlide(i)"
-    [isPrevious]="isPreviousSlide(i)" [isNext]="isNextSlide(i)" [isTransitioning]="isTransitioning">
+  @for (slide of slides; track $index) {
+  <app-slide [slide]="slide" [isActive]="isActiveSlide($index)" [isPrevious]="isPreviousSlide($index)"
+    [isNext]="isNextSlide($index)" [isTransitioning]="isTransitioning()">
   </app-slide>
+  }
 </div>

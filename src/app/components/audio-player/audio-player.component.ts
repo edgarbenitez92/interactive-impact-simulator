@@ -1,6 +1,6 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+
 import { AudioPlayerService } from '../../services/audio-player.service';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-audio-player',
@@ -9,14 +9,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
   templateUrl: './audio-player.component.html',
   styleUrl: './audio-player.component.scss'
 })
-export class AudioPlayerComponent implements OnInit {
+export class AudioPlayerComponent {
   private readonly audioPlayerService = inject(AudioPlayerService);
 
   isAudioMuted = computed(() => this.audioPlayerService.isMuted$());
-
-  ngOnInit(): void {
-    console.log('Audio Player initialized - simulated mode');
-  }
 
   toggleMute(event: Event): void {
     event.stopPropagation();
